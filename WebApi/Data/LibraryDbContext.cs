@@ -8,7 +8,7 @@ namespace WebApi.Data
         {
         }
 
-        // Add your database tables (DbSets) here, for example:
-        // public DbSet<Book> Books { get; set; }
+        // This line tells Entity Framework to create a "Books" table
+        public DbSet<Book> Books { get; set; }
     }
 }

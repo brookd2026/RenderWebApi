@@ -32,4 +32,40 @@ app.Urls.Add($"http://*:{port}");
 
 app.MapGet("/", () => "Hello from C# on Render!");
 
+// 1. GET: Read all books from the database
+app.MapGet("/books", async (LibraryDbContext db) =>
+    await db.Books.ToListAsync());
+
+// 2. POST: Add a new book to the database (No Swagger needed if using Method 2 below)
+app.MapPost("/books", async (Book book, LibraryDbContext db) =>
+{
+    db.Books.Add(book);
+    await db.SaveChangesAsync();
+    return Results.Created($"/books/{book.Id}", book);
+});
+
+// 3. PUT: Update an existing book's details
+app.MapPut("/books/{id}", async (int id, Book updatedBook, LibraryDbContext db) =>
+{
+    var book = await db.Books.FindAsync(id);
+    if (book is null) return Results.NotFound();
+
+    book.Title = updatedBook.Title;
+    book.Author = updatedBook.Author;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// 4. DELETE: Remove a book from the database
+app.MapDelete("/books/{id}", async (int id, LibraryDbContext db) =>
+{
+    if (await db.Books.FindAsync(id) is Book book)
+    {
+        db.Books.Remove(book);
+        await db.SaveChangesAsync();
+        return Results.Ok(book);
+    }
+    return Results.NotFound();
+});
 app.Run();
