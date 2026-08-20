@@ -8,6 +8,7 @@ RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Runtime using the .NET 10 ASP.NET Engine
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:8080
