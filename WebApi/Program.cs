@@ -54,6 +54,19 @@ app.Urls.Add($"http://*:{port}");
 
 app.MapGet("/", () => "Hello from C# on Render!");
 
+app.MapGet("/books/{id:int}", async (int id, LibraryDbContext db) =>
+{
+    var book = await db.Books.FindAsync(id);
+
+    if (book is null)
+    {
+        return Results.NotFound(new { Message = $"Book with ID {id} was not found." });
+    }
+
+    return Results.Ok(book);
+});
+    
+
 // 1. GET: Read all books from the database
 app.MapGet("/books", async (LibraryDbContext db) =>
     await db.Books.ToListAsync());
