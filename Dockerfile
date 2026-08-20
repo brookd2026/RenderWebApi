@@ -7,7 +7,7 @@ COPY . .
 RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Runtime
-FROM :/microsoft.com
+FROM ://microsoft.com AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:8080
