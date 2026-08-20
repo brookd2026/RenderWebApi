@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 
@@ -24,11 +25,32 @@ if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("post
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// Add these two lines to register Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+// ==========================================
+// 2. CONFIGURE MIDDLEWARE PIPELINE
+// ==========================================
+
+// Add these lines to enable Swagger UI on your live URL
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+    c.RoutePrefix = "swagger"; // Exposes UI at ://onrender.com
+});
 
 // Render assigns a dynamic port via the PORT environment variable
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}");
+
+// ==========================================
+// 3. DEFINE API ENDPOINTS
+// ==========================================
+
 
 app.MapGet("/", () => "Hello from C# on Render!");
 
@@ -37,7 +59,7 @@ app.MapGet("/books", async (LibraryDbContext db) =>
     await db.Books.ToListAsync());
 
 // 2. POST: Add a new book to the database (No Swagger needed if using Method 2 below)
-app.MapPost("/books", async (Book book, LibraryDbContext db) =>
+app.MapPost("/books", async ([FromBody] Book book, LibraryDbContext db) =>
 {
     db.Books.Add(book);
     await db.SaveChangesAsync();
