@@ -1,7 +1,7 @@
 # Stage 1: Build using the .NET 10 SDK
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["WebApi.csproj", "./"]
+COPY ["WebApi/WebApi.csproj", "./"]
 RUN dotnet restore
 COPY . .
 RUN dotnet publish -c Release -o /app/publish
